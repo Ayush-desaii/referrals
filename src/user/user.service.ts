@@ -64,4 +64,19 @@ export class UserService {
     }
     return user;
   }
+
+  async login(createUserDto: CreateUserDto): Promise<UsersRef> {
+    const { email, password } = createUserDto;
+    const user = await this.usersRepository.findOne({ where: { email, password } });
+    if (!user) {
+      throw new Error('Invalid email or password');
+    }
+    return user;
+  }
+
+  async findByEmail(email: string): Promise<UsersRef | null> {
+    return this.usersRepository.findOne({ where: { email } });
+  }
+
 }
+
