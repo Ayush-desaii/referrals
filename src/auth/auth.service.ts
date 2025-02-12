@@ -26,7 +26,7 @@ export class AuthService {
     const payload = { email: user.email, sub: user.id };
     const access_token =  this.jwtService.sign(payload);
     
-    res.cookie('jwt', access_token, { httpOnly: true }).json({m:"hugug"}); // Set cookie with JWT
+    res.cookie('jwt', access_token, { httpOnly: true , maxAge: 24*60*60*1000}).json({m:"hugug"}); // Set cookie with JWT
     return {
       messgae: "login success",
     };
