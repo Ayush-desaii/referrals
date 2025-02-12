@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, BadRequestException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, BadRequestException, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './create-user.dto';
 import { UsersRef } from './user.entity';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
+import { CustomRequest } from "../../custom-request.interface"
 
 @Controller('user')
 export class UserController {
@@ -23,14 +24,13 @@ export class UserController {
     return this.userService.login(createUserDto);
   }
 
-  @Get()
-  findAll(): Promise<UsersRef[]> {
-    return this.userService.findAll();
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Get(':id')
-  findById(@Param('id') id: number): Promise<UsersRef> {
-    return this.userService.findById(id);
+  @Get("get")
+  findById(@Req() req: CustomRequest): Promise<UsersRef> {
+    if (!req.user) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+  
+    console.log(req.user.id);
+    return this.userService.findById(req.user.sub);
   }
 }

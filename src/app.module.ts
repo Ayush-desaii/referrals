@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
+import { JwtModule } from '@nestjs/jwt';
 import { UsersRef } from './user/user.entity';
 import { AuthModule } from './auth/auth.module';
+import { JwtCookieAuthMiddleware } from './auth/auth.middleware';
 
 @Module({
   imports: [
@@ -19,8 +21,16 @@ import { AuthModule } from './auth/auth.module';
       synchronize: true, // Set to false in production
     }),
     UserModule,
-    AuthModule,],
+    AuthModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'secretKey', // Keep this secret in env file
+      signOptions: { expiresIn: '1d' }, // Token expiration time
+    })],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtCookieAuthMiddleware).forRoutes('user/get');
+  }
+}

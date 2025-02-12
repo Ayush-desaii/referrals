@@ -65,6 +65,7 @@ export class UserService {
   }
 
   async findById(id: number): Promise<UsersRef> {
+    console.log(id);
     const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
       throw new Error(`User with ID ${id} not found`);
