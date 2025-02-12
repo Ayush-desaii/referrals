@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './create-user.dto';
 import { UsersRef } from './user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -20,11 +21,13 @@ export class UserService {
         newReferralCode = Math.floor(100000 + Math.random() * 900000); // 6-digit number
     } while (await this.usersRepository.findOne({ where: { referalCode: newReferralCode } }));
 
+    const hashedpass = await bcrypt.hash(password, 10);
+
     // Create the new user
     const newUser = this.usersRepository.create({
         name,
         email,
-        password,
+        password : hashedpass,
         referalCode: newReferralCode,
         referedUsers: [],
     });

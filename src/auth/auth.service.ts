@@ -12,7 +12,7 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
-    if (user && user.password === password) { // Direct password comparison
+    if (user && await bcrypt.compare(password, user.password)) { // Direct password comparison
       const { password, ...result } = user; // Exclude password from response
       return result;
     }
