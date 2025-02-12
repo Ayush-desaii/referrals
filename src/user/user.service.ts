@@ -29,6 +29,8 @@ export class UserService {
         referedUsers: [],
     });
 
+    
+
     if (referalCode) {
         // Find the referring user
         const referringUser = await this.usersRepository.findOne({ where: { referalCode } });
@@ -39,9 +41,11 @@ export class UserService {
 
         // Assign referalBy to the referring user's ID
         newUser.referalBy = referringUser.id;
+        
+        const uuser = await this.usersRepository.save(newUser)
 
         // Add the new user's referral code to the referring user's referedUsers array
-        referringUser.referedUsers = [...(referringUser.referedUsers || []), newReferralCode];
+        referringUser.referedUsers = [...(referringUser.referedUsers || []), uuser.id];
 
         // Save the referring user with the updated referedUsers array
         await this.usersRepository.save(referringUser);
